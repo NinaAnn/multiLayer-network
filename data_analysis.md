@@ -225,6 +225,8 @@ And connection between 'WNJD_203_83' and 'WNJD_203_10' is also active
     'srcaddr': '100.6.1.10'
     'destaddr': '100.6.1.1'
 
+存在protocol_dict中未出现的协议：309
+
 ### Node
 
 Now we have a network node called 'WNJD_303_19', we want to know weather it is unique for one IP address.

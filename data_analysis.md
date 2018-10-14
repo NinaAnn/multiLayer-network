@@ -269,9 +269,9 @@ The first one is in level 303 with corresponding network node **WNJD_303_19**, t
 
 ### Event节点和relationship中节点的部分关系
 
-event中出现的协议有：205，303，213，212，309，302，104，101，103，301.
-其中，协议为205和212的event涉及到的两个节点，在link_relationship有的出现，有的不出现。
-协议为103和309的event涉及到的两个节点在link_relationship中从未出现.
+event中出现的协议有：205，303，213，212，309，302，104，101，103，301.  
+其中，协议为205和212的event涉及到的两个节点，在link_relationship有的出现，有的不出现。  
+协议为103和309的event涉及到的两个节点在link_relationship中从未出现.  
 其他协议节点都有出现.
 
 ## Question

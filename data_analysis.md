@@ -225,6 +225,8 @@ And connection between 'WNJD_203_83' and 'WNJD_203_10' is also active
     'srcaddr': '100.6.1.10'
     'destaddr': '100.6.1.1'
 
+存在protocol_dict中未出现的协议：309
+
 ### Node
 
 Now we have a network node called 'WNJD_303_19', we want to know weather it is unique for one IP address.
@@ -264,6 +266,20 @@ Then we search for IP address **100.6.1.9** in *link*, there are two different k
 The first one is in level 303 with corresponding network node **WNJD_303_19**, the second one is in level 203 with corresponding network node **WNJD_203_96**.
 
 > One IP address have only one corresponding network node in one level, but it can appear in both level 2 and level 3(of course).
+
+### Event节点和relationship中节点的部分关系
+
+event中出现的协议有：205，303，213，212，309，302，104，101，103，301.  
+其中，协议为212(TCP)的event涉及到的两个节点，在link_relationship有的出现，有的不出现。  
+协议为103(Link16)和309(unknown)和205(OSPF)的event涉及到的两个节点在link_relationship中从未出现.  
+其他协议节点都有出现.
+对于涉及节点在link中出现的event：
+303(SMTP)：一共12个event，每个event在link中都有直接的对应（没有经过中转节点）
+301(HTTP): 共128个，每个event在link中都有直接的对应
+302(FTP): 一共174个，每个event在link中都有直接的对应
+101(VAST): 855个，其中218个在link中找不到路径，其他可以找到路径或直接对应
+104：全部有直接对应
+212(TCP): 一共16448个，所有涉及的两个节点在link中都找不到路径
 
 ## Question
 

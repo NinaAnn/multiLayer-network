@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>visualiaztion</title>
+</head>
+<body>
+
+<script src="d3.min.js"></script>
+<script>
+
+get_data().then((res)=>{
+    let [dataset_nodes, dataset_links, dataset_events] = res;
+
+    const width = window.innerWidth * 0.95, height = window.innerHeight * 0.95;
+    const padding = 20;
+    const links_color = 'red';
+    const events_color = 'blue';
+    const colors = ['red', 'blue', 'black'];
+    const both = 'yellow';
+
+    console.log('nodes', dataset_nodes);
+    console.log('links', dataset_links);
+    console.log('events', dataset_events);
+
+
+    // belong. 0: link, 1: event, 2: both
+    // an inefficient method
+    let i, j;
+    let dataset_edges = [];
+    let visited = [];
+    for (i = 0; i < dataset_events.length; ++i){
+        visited[i] = false;
+    }
+    let flag;
+    for (i = 0; i < dataset_links.length; ++i){
+        flag = true;
+        for (j = 0; j < dataset_events.length; ++j){
+            if ((dataset_links[i]['source'] === dataset_events[j]['source'] && dataset_links[i]['target'] === dataset_events[j]['target'])
+                    || dataset_links[i]['source'] === dataset_events[j]['target'] && dataset_links[i]['target'] === dataset_events[j]['source']) {
+                if (visited[j] === false) {
+                    visited[j] = true;
+                    dataset_links[i].belong = 2;
+                    dataset_edges.push(dataset_links[i]);
+                }
+                flag = false;
+                break;
+            }
+        }
+        if (flag){
+            dataset_links[i].belong = 0;
+            dataset_edges.push(dataset_links[i]);
+        }
+    }
+    for (i = 0; i < dataset_events.length; ++i){
+        if(visited[i] === false){
+            dataset_events[i].belong = 1;
+            dataset_edges.push(dataset_events[i]);
+        }
+    }
+    console.log(visited);
+
+    let svg = d3.select('body')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+    let simulation = d3.forceSimulation(dataset_nodes)
+        .force('charge', d3.forceManyBody().strength(-15))
+        .force('link', d3.forceLink(dataset_edges).distance(40))
+        .force('center', d3.forceCenter(width / 2, height / 2));
+
+    let edges = svg.selectAll('.links')
+        .data(dataset_edges)
+        .enter()
+        .append('line')
+        .attr('class', 'links')
+        .style('stroke', function(d){
+            return colors[d.belong];
+        })
+        .style('stroke-width', '2');
+
+    let nodes = svg.selectAll('.nodes')
+        .data(dataset_nodes)
+        .enter()
+        .append('circle')
+        .attr('class', 'nodes')
+        .attr('r', '10')
+        .attr('fill', 'black')
+        .call(d3.drag()
+            .on('start', drag_start)
+            .on('drag', dragged)
+            .on('end', drag_end));
+
+    simulation.on('tick', ticked);
+
+    function ticked(){
+        edges
+             .attr('x1', function(d) {
+                    return d.source.x;
+                })
+                .attr('y1', function(d) {
+                    return d.source.y;
+                })
+                .attr('x2', function(d) {
+                    return d.target.x;
+                })
+                .attr('y2', function(d) {
+                    return d.target.y;
+                });
+
+        nodes
+            .attr('cx', function(d){
+                return d.x;
+            })
+            .attr('cy', function(d){
+                return d.y;
+            });
+    }
+
+    function drag_start(d){
+        if (!d3.event.active) simulation.alphaTarget(0.5).restart();
+        d.fixed = true;
+        d.fx = d.x;
+        d.fy = d.y;
+    }
+
+    function dragged(d){
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+        d3.select(this).attr('fill', 'yellow');
+    }
+
+    function drag_end(d){
+        if (!d3.event.active) simulation.alphaTarget(0.3);
+        // d.fx = null;
+        // d.fy = null;
+        d3.select(this).attr('fill', 'black');
+    }
+});
+
+async function get_data(){
+    let nodes = await d3.json('nodes.json');
+    let links = await d3.json('links.json');
+    let events = await d3.json('events.json');
+
+    return [nodes, links, events];
+}
+
+</script>
+
+</body>
+</html>
